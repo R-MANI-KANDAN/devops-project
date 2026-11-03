@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Menu - Pre-Order Food</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Explore Menu &amp; Pre-Order</h1>
+            <p class="page-subtitle">Select fresh canteen delicacies, choose your pickup window, and avoid waiting queues.</p>
+        </div>
+        <a th:href="@{/customer/cart}" class="btn btn-primary">
+            View Cart (<span th:text="${cartCount}">0</span>)
+        </a>
+    </div>
+
+    <div th:replace="~{fragments :: alerts}"></div>
+
+    <!-- Search & Filter Bar -->
+    <div class="filter-bar">
+        <form th:action="@{/customer/menu}" method="get" style="display: flex; gap: 0.8rem; flex: 1; min-width: 250px;">
+            <input type="hidden" name="category" th:value="${selectedCategory}">
+            <input type="text" name="search" th:value="${searchQuery}" placeholder="Search biryani, burgers, pizza, drinks..." style="flex: 1;">
+            <button type="submit" class="btn btn-secondary">Search</button>
+            <a th:if="${searchQuery != null and searchQuery != ''}" th:href="@{/customer/menu(category=${selectedCategory})}" class="btn btn-outline">Clear</a>
+        </form>
+
+        <div class="filter-categories">
+            <a th:href="@{/customer/menu(search=${searchQuery}, category='ALL')}"
+               class="category-pill"
+               th:classappend="${selectedCategory == 'ALL' ? 'active' : ''}">All Items</a>
+            <a th:each="cat : ${categories}"
+               th:href="@{/customer/menu(search=${searchQuery}, category=${cat})}"
+               class="category-pill"
+               th:classappend="${selectedCategory == cat ? 'active' : ''}"
+               th:text="${cat}">Category</a>
+        </div>
+    </div>
+
+    <!-- Menu Cards Grid -->
+    <div class="cards-grid">
+        <div th:each="item : ${foodItems}" class="card food-card">
+            <span class="food-category-tag" th:text="${item.category}">Category</span>
+            <h3 class="food-title" th:text="${item.name}">Chicken Biryani</h3>
+            <p class="food-desc" th:text="${item.description}">Fragrant long grain rice</p>
+
+            <div class="food-footer">
+                <span class="food-price" th:text="'₹' + ${#numbers.formatDecimal(item.price, 1, 2)}">₹220.00</span>
+                <form th:action="@{/customer/cart/add}" method="post" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="hidden" name="foodId" th:value="${item.id}">
+                    <input type="number" name="quantity" value="1" min="1" max="10" style="width: 55px; padding: 0.4rem; text-align: center;">
+                    <button type="submit" class="btn btn-primary btn-sm">+ Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(foodItems)}" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+        <p style="font-size: 1.2rem;">No food items found matching your filter criteria.</p>
+        <a th:href="@{/customer/menu}" class="btn btn-outline" style="margin-top: 1rem;">Reset Filters</a>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+
+</body>
+</html>

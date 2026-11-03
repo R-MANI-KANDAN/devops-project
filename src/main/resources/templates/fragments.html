@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragments</title>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav th:fragment="navbar" class="navbar">
+    <a class="nav-brand" th:href="@{/home}">
+        <span class="brand-icon">🍽️</span> FoodPreOrder
+    </a>
+
+    <ul class="nav-links">
+        <!-- Customer Links -->
+        <li sec:authorize="hasAuthority('ROLE_CUSTOMER')">
+            <a th:href="@{/customer/menu}">Food Menu</a>
+        </li>
+        <li sec:authorize="hasAuthority('ROLE_CUSTOMER')">
+            <a th:href="@{/customer/cart}">
+                Cart <span class="cart-pill" th:text="${cartCount != null ? cartCount : 0}">0</span>
+            </a>
+        </li>
+        <li sec:authorize="hasAuthority('ROLE_CUSTOMER')">
+            <a th:href="@{/customer/orders}">My Orders</a>
+        </li>
+
+        <!-- Vendor Links -->
+        <li sec:authorize="hasAuthority('ROLE_VENDOR')">
+            <a th:href="@{/vendor/dashboard}">Live Orders</a>
+        </li>
+        <li sec:authorize="hasAuthority('ROLE_VENDOR')">
+            <a th:href="@{/vendor/menu}">Menu Management</a>
+        </li>
+
+        <!-- Admin Links -->
+        <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+            <a th:href="@{/admin/dashboard}">Analytics</a>
+        </li>
+        <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+            <a th:href="@{/admin/users}">User Accounts</a>
+        </li>
+        <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+            <a th:href="@{/admin/reports}">Reports & Statistics</a>
+        </li>
+    </ul>
+
+    <div class="nav-user">
+        <span sec:authorize="isAuthenticated()" class="role-badge" sec:authentication="name">User</span>
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+            <button class="btn btn-outline btn-sm" type="submit" style="color:#fff; border-color:rgba(255,255,255,0.3);">Logout</button>
+        </form>
+        <a sec:authorize="!isAuthenticated()" class="btn btn-primary btn-sm" th:href="@{/login}">Login</a>
+    </div>
+</nav>
+
+<!-- Alerts Fragment -->
+<div th:fragment="alerts" class="alerts-wrapper">
+    <div th:if="${successMessage}" class="alert alert-success">
+        <span th:text="${successMessage}">Operation successful!</span>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <span th:text="${errorMessage}">An error occurred.</span>
+    </div>
+</div>
+
+<!-- Footer Fragment -->
+<footer th:fragment="footer">
+    <p>Food Pre-Ordering System &copy; 2026 | Built with Spring Boot MVC &amp; Thymeleaf</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Menu Management - Food Pre-Ordering</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Canteen Menu Catalog</h1>
+            <p class="page-subtitle">Add new dishes, modify prices, update descriptions, and toggle item availability.</p>
+        </div>
+        <div style="display:flex; gap: 0.6rem;">
+            <a th:href="@{/vendor/dashboard}" class="btn btn-outline">&larr; Back to Orders</a>
+            <a th:href="@{/vendor/menu/new}" class="btn btn-primary">+ Add New Food Item</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments :: alerts}"></div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Dish Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Availability</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${foodItems}">
+                    <td th:text="'#' + ${item.id}">#1</td>
+                    <td><strong th:text="${item.name}">Dish Name</strong></td>
+                    <td>
+                        <span class="status-badge" style="background:#f1f5f9; color:var(--dark);" th:text="${item.category}">Category</span>
+                    </td>
+                    <td><strong style="color:var(--primary);" th:text="'₹' + ${#numbers.formatDecimal(item.price, 1, 2)}">₹0.00</strong></td>
+                    <td style="max-width: 320px; font-size: 0.85rem; color: var(--text-muted);" th:text="${item.description}">Description</td>
+                    <td>
+                        <form th:action="@{/vendor/menu/toggle/{id}(id=${item.id})}" method="post">
+                            <button type="submit" class="btn btn-sm"
+                                    th:classappend="${item.available ? 'btn-primary' : 'btn-outline'}"
+                                    style="padding: 0.25rem 0.6rem; font-size: 0.75rem;"
+                                    title="Click to toggle availability">
+                                <span th:text="${item.available ? '✓ In Stock' : '✕ Out of Stock'}">In Stock</span>
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <a th:href="@{/vendor/menu/edit/{id}(id=${item.id})}" class="btn btn-outline btn-sm">Edit</a>
+                            <form th:action="@{/vendor/menu/delete/{id}(id=${item.id})}" method="post"
+                                  onsubmit="return confirm('Are you sure you want to delete this food item?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Dashboard - Food Pre-Ordering</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">System Administration &amp; Insights</h1>
+            <p class="page-subtitle">Overall order statistics, business revenue, registered users, and system monitoring.</p>
+        </div>
+        <div style="display:flex; gap:0.6rem;">
+            <a th:href="@{/admin/users}" class="btn btn-outline">Manage User Accounts</a>
+            <a th:href="@{/admin/reports}" class="btn btn-primary">Generate Reports</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments :: alerts}"></div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="card stat-card" style="border-left-color: #2563eb;">
+            <span class="stat-label">Total Registered Users</span>
+            <span class="stat-value" th:text="${totalUsers}">0</span>
+            <small style="color:var(--text-muted); margin-top:4px;">
+                <span th:text="${totalCustomers}">0</span> Customers | <span th:text="${totalVendors}">0</span> Vendors
+            </small>
+        </div>
+        <div class="card stat-card" style="border-left-color: #16a34a;">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value" style="color: #16a34a;" th:text="'₹' + ${#numbers.formatDecimal(totalRevenue, 1, 2)}">₹0.00</span>
+            <small style="color:var(--text-muted); margin-top:4px;">Across all completed &amp; active pre-orders</small>
+        </div>
+        <div class="card stat-card" style="border-left-color: #ea580c;">
+            <span class="stat-label">Total Pre-Orders</span>
+            <span class="stat-value" th:text="${totalOrders}">0</span>
+            <small style="color:var(--text-muted); margin-top:4px;">
+                <span th:text="${completedOrders}">0</span> Completed | <span th:text="${pendingOrders}">0</span> Pending
+            </small>
+        </div>
+        <div class="card stat-card" style="border-left-color: #7c3aed;">
+            <span class="stat-label">Active Menu Items</span>
+            <span class="stat-value" th:text="${totalMenuItems}">0</span>
+            <small style="color:var(--text-muted); margin-top:4px;">Dishes across all categories</small>
+        </div>
+    </div>
+
+    <!-- Two Columns: Recent Orders and Popular Food Items -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.8rem; align-items: start;">
+        <!-- Left: Recent Orders -->
+        <div class="card">
+            <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Recent Order Activity</h3>
+            <div class="table-wrapper" style="box-shadow: none; border: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Pickup Date/Time</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${recentOrders}">
+                            <td><strong style="color: var(--primary);" th:text="${order.orderNumber}">ORD-10001</strong></td>
+                            <td th:text="${order.customerName}">Aksheen Jane</td>
+                            <td>
+                                <span th:text="${order.pickupDate}">2026-11-04</span><br>
+                                <small style="color: var(--text-muted);" th:text="${order.pickupTime}">12:30 PM</small>
+                            </td>
+                            <td><strong th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 2)}">₹0.00</strong></td>
+                            <td>
+                                <span class="status-badge" th:classappend="'status-' + ${order.orderStatus}" th:text="${order.orderStatus}">STATUS</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right: Popular Food Items -->
+        <div class="card">
+            <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Top Popular Dishes</h3>
+            <div th:if="${#maps.isEmpty(popularItems)}" style="color: var(--text-muted); padding: 1rem 0;">
+                No order trends available yet.
+            </div>
+            <ul th:if="${!#maps.isEmpty(popularItems)}" style="list-style: none; padding: 0;">
+                <li th:each="entry, stat : ${popularItems}" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                    <div>
+                        <span style="font-weight: 700; color: var(--primary); margin-right: 0.5rem;" th:text="'#' + ${stat.count}">#1</span>
+                        <strong th:text="${entry.key}">Dish Name</strong>
+                    </div>
+                    <span class="status-badge" style="background: #ffedd5; color: #c2410c;" th:text="${entry.value} + ' orders'">5 orders</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+
+</body>
+</html>

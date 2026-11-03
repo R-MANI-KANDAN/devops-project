@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Accounts Management - Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">User Accounts Administration</h1>
+            <p class="page-subtitle">Manage customer, vendor, and administrator credentials and access authorizations.</p>
+        </div>
+        <a th:href="@{/admin/dashboard}" class="btn btn-outline">&larr; Back to Dashboard</a>
+    </div>
+
+    <div th:replace="~{fragments :: alerts}"></div>
+
+    <!-- Filter by Role -->
+    <div class="filter-bar">
+        <span style="font-weight: 600; font-size: 0.9rem; color: var(--dark);">Filter by Role:</span>
+        <div class="filter-categories">
+            <a th:href="@{/admin/users(role='ALL')}" class="category-pill" th:classappend="${selectedRole == 'ALL' ? 'active' : ''}">All Users</a>
+            <a th:href="@{/admin/users(role='ROLE_CUSTOMER')}" class="category-pill" th:classappend="${selectedRole == 'ROLE_CUSTOMER' ? 'active' : ''}">Customers</a>
+            <a th:href="@{/admin/users(role='ROLE_VENDOR')}" class="category-pill" th:classappend="${selectedRole == 'ROLE_VENDOR' ? 'active' : ''}">Vendors</a>
+            <a th:href="@{/admin/users(role='ROLE_ADMIN')}" class="category-pill" th:classappend="${selectedRole == 'ROLE_ADMIN' ? 'active' : ''}">Administrators</a>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Phone Number</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="'#' + ${user.id}">#1</td>
+                    <td><strong th:text="${user.name}">John Doe</strong></td>
+                    <td th:text="${user.email}">john@example.com</td>
+                    <td th:text="${user.phone}">9876543210</td>
+                    <td>
+                        <span class="role-badge" th:text="${user.role}">ROLE_CUSTOMER</span>
+                    </td>
+                    <td>
+                        <span class="status-badge"
+                              th:classappend="${user.active ? 'status-COMPLETED' : 'status-CANCELLED'}"
+                              th:text="${user.active ? 'Active' : 'Deactivated'}">Active</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <form th:action="@{/admin/users/{id}/toggle(id=${user.id})}" method="post">
+                                <button type="submit" class="btn btn-outline btn-sm"
+                                        th:text="${user.active ? 'Deactivate' : 'Activate'}">
+                                    Deactivate
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post"
+                                  onsubmit="return confirm('Permanently remove this user account?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+
+</body>
+</html>
